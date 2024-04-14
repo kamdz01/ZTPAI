@@ -1,8 +1,7 @@
 package com.kamdz.notility.model;
 
-
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -10,53 +9,22 @@ import java.util.Set;
 public class Note {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String title;
-    private String content;
+    private Long note_id;
 
-    @OneToMany(mappedBy = "note", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<UserNote> userNotes = new HashSet<>();
+    private String note_title;
+    private String note_content;
 
-    @OneToMany(mappedBy = "note", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<NoteRole> noteRoles = new HashSet<>();
+    @OneToMany(mappedBy = "note")
+    @JsonManagedReference
+    private Set<NoteRole> noteRoles;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public Set<UserNote> getUserNotes() {
-        return userNotes;
-    }
-
-    public void setUserNotes(Set<UserNote> userNotes) {
-        this.userNotes = userNotes;
-    }
-
-    public Set<NoteRole> getNoteRoles() {
-        return noteRoles;
-    }
-
-    public void setNoteRoles(Set<NoteRole> noteRoles) {
-        this.noteRoles = noteRoles;
-    }
+    // Standard getters and setters
+    public Long getId() { return note_id; }
+    public void setId(Long note_id) { this.note_id = note_id; }
+    public String getTitle() { return note_title; }
+    public void setTitle(String note_title) { this.note_title = note_title; }
+    public String getContent() { return note_content; }
+    void setContent(String note_content) { this.note_content = note_content; }
+    public Set<NoteRole> getNoteRoles() { return noteRoles; }
+    void setNoteRoles(Set<NoteRole> noteRoles) { this.noteRoles = noteRoles; }
 }

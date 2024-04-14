@@ -1,5 +1,6 @@
 package com.kamdz.notility.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 @Entity
@@ -7,37 +8,22 @@ import jakarta.persistence.*;
 public class NoteRole {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long note_role_id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "note_id")
+    @JsonBackReference
     private Note note;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    Note getNote() {
-        return note;
-    }
-
-    void setNote(Note note) {
-        this.note = note;
-    }
-
-    Role getRole() {
-        return role;
-    }
-
-    void setRole(Role role) {
-        this.role = role;
-    }
+    // Standard getters and setters
+    public Long getId() { return note_role_id; }
+    public void setId(Long note_role_id) { this.note_role_id = note_role_id; }
+    public Note getNote() { return note; }
+    public void setNote(Note note) { this.note = note; }
+    Role getRole() { return role; }
+    void setRole(Role role) { this.role = role; }
 }
