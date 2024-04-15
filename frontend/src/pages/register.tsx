@@ -40,20 +40,20 @@ const styles = {
         marginBottom: "20px",
     },
     input: {
-        width: "100%",
+        width: "330px",
         padding: "10px",
-        margin: "10px 0",
+        margin: "15px auto 5px auto",
         borderRadius: "5px",
     },
     button: {
-        width: "100%",
+        width: "350px",
         padding: "10px",
         backgroundColor: "#296F1D",
         color: "white",
         border: "none",
         borderRadius: "5px",
         cursor: "pointer" as const,
-        marginTop: "20px",
+        margin: "15px auto 5px auto",
     },
     link: {
         color: "#35C2C1",
@@ -88,7 +88,7 @@ const Register: React.FC = () => {
                 <div style={styles.returnBtn}><a href="/"><h2>&lt;</h2></a></div>
                 <div style={styles.column}>
                     <div style={styles.header}>Notility</div>
-                    <img src={logo} alt="logo" style={{ width: '30%' }} />
+                    <img src={logo} alt="logo" style={{ width: '50%' }} />
                     <h3>Hello! Register to get started</h3>
                     <form onSubmit={handleSubmit}>
                         <input 
