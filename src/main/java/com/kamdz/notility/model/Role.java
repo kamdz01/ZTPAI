@@ -1,25 +1,33 @@
 package com.kamdz.notility.model;
-
 import jakarta.persistence.*;
-import java.util.Set;
 
 @Entity
-@Table(name = "roles")
+@Table(name = "note_roles")
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long note_role_id;
 
-    private String name;
+    private String note_role_name;
 
-    @OneToMany(mappedBy = "role")
-    private Set<NoteRole> noteRoles;
+    // Constructors
+    public Role() {
+    }
 
-    // Standard getters and setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public String getName() { return name; }
-    void setName(String name) { this.name = name; }
-    public Set<NoteRole> getNoteRoles() { return noteRoles; }
-    void setNoteRoles(Set<NoteRole> noteRoles) { this.noteRoles = noteRoles; }
+    // Getters and setters
+    public Long getNote_role_id() {
+        return note_role_id;
+    }
+
+    public void setNote_role_id(Long note_role_id) {
+        this.note_role_id = note_role_id;
+    }
+
+    public String getNote_role_name() {
+        return note_role_name;
+    }
+
+    public void setNote_role_name(String note_role_name) {
+        this.note_role_name = note_role_name;
+    }
 }
