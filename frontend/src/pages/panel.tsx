@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import TopBar from './topbar.tsx';
+import { jwtDecode } from "jwt-decode";
 
 type Note = {
     note_id: number;
@@ -8,16 +9,59 @@ type Note = {
     note_role_id: string;
 };
 
-const notes: Note[] = [
-    { note_id: 1, note_title: "First Note", note_content: "This is the first note content...", note_role_id: "2" },
-    { note_id: 2, note_title: "Second Note", note_content: "Content of the second note goes here...", note_role_id: "2" },
-    { note_id: 3, note_title: "Third Note", note_content: "Here is the third note's content...", note_role_id: "2" },
-    { note_id: 4, note_title: "Fourth Note", note_content: "Fourth note content here...", note_role_id: "2" },
-    { note_id: 5, note_title: "Fifth Note", note_content: "Fifth note's content...", note_role_id: "2" },
-    { note_id: 6, note_title: "Sixth Note", note_content: "Content for the sixth note...", note_role_id: "2" }
-];
+function getUserIdFromToken(token: string): string | null {
+    try {
+      const decodedToken: any = jwtDecode(token); // Decoded token can be of any type
+      if (decodedToken && decodedToken.sub) {
+        return decodedToken.id;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error decoding token:', error);
+      return null;
+    }
+  }
 
-const NotesPanel: React.FC = () => {
+const NotesPanel = () => {
+    const [notes, setUserNotes] = useState<Note[]>([]);
+
+    useEffect(() => {
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+        console.error("No token found");
+        return;
+    }
+    const userId = getUserIdFromToken(token);
+    console.log(userId);
+
+
+
+    const headers = {
+        'Authorization': `Bearer ${token}`  // Prepare the Authorization header
+    };
+
+    console.log(token);
+
+    fetch(`http://localhost:8080/api/users/${userId}`, { method: 'GET', headers: headers })
+        .then(response => response.json())
+        .then(response => {
+            console.log(response);
+            return response;
+        })
+        .then(userData => {
+            const filteredNotes = userData.userNotes.map((note: any) => {
+                return {
+                    note_id: note.note.note_id,
+                    note_title: note.note.note_title,
+                    note_content: note.note.note_content,
+                    noteRole_id: note.noteRole.id
+                };
+            });
+            setUserNotes(filteredNotes);
+        })
+        .catch(error => console.error('Error:', error));
+    }, []);
+
     return (
         <div style={{ backgroundColor: '#031400', color: '#E0FFDF', fontFamily: 'Arial', textAlign: 'center', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <TopBar />

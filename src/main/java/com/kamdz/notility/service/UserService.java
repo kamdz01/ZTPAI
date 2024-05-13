@@ -11,6 +11,7 @@ import com.kamdz.notility.model.Credential;
 import com.kamdz.notility.model.SignUp;
 import com.kamdz.notility.model.User;
 import com.kamdz.notility.repository.UserRepository;
+import com.kamdz.notility.repository.RoleRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,6 +29,7 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+    private final RoleRepository roleRepository;
 
     public List<User> findAllUsers() {
         return userRepository.findAll();
@@ -84,6 +86,7 @@ public class UserService {
         }
 
         User user = userMapper.signUpToUser(userDto);
+        roleRepository.findById(2L).ifPresent(user::setRole);
 
         user.setPassword(bCryptPasswordEncoder.encode(new String(userDto.getPassword())));
 

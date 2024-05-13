@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
 import logo from '../images/logo2.png';
+import { handleAuthRequest } from '../auth/AuthRequest.tsx';
+import { setAuthHeader } from '../services/BackendService.tsx';
+
+const API_URL: string = "http://localhost:8080";
 
 const styles = {
     body: {
@@ -45,6 +49,9 @@ const styles = {
         margin: "15px auto 5px auto",
         borderRadius: "5px",
     },
+    error: {
+        color: "red"
+    },
     button: {
         width: "350px",
         padding: "10px",
@@ -64,23 +71,42 @@ const styles = {
 };
 
 const Register: React.FC = () => {
-    const [login, setLogin] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
+    const [error, setError] = useState("");
 
-    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>, setter: React.Dispatch<React.SetStateAction<string>>) => {
-        setter(event.target.value);
-    };
+  
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      const data = new FormData(event.currentTarget);
+      const login = data.get("login");
+      const email = data.get("email");
+      const password = data.get("password");
+      const confirmPassword = data.get("confirmPassword");
+  
+      if (password !== confirmPassword) {
+        setError("Passwords do not match");
+        return;
+      }
+      try {
+        const response = await fetch(`${API_URL}/signup`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ login, email, password }),
+        });
+  
+        if (!response.ok) throw new Error("Signup failed");
+        const result = await handleAuthRequest("login", { login, password });
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        if (password !== confirmPassword) {
-            alert("Passwords do not match!");
-            return;
+        if (result.success) {
+          setAuthHeader(result.data.token);
+          window.location.href = "/main";
+        } else {
+          throw Error(result.error);
         }
-        console.log('Registering:', login, email, password);
+      } catch (error) {
+        setError("Signup failed. Please try again.");
+      }
     };
+  
 
     return (
         <div style={styles.body}>
@@ -93,36 +119,41 @@ const Register: React.FC = () => {
                     <form onSubmit={handleSubmit}>
                         <input 
                             style={styles.input}
-                            type="text"
+                            required
+                            id="login"
                             name="login"
                             placeholder="Login"
-                            value={login}
-                            onChange={(e) => handleInputChange(e, setLogin)}
+                            autoComplete="login"
+                            autoFocus
                         />
                         <input 
                             style={styles.input}
                             type="text"
+                            required
                             name="email"
                             placeholder="Email"
-                            value={email}
-                            onChange={(e) => handleInputChange(e, setEmail)}
+                            id="email"
+                            autoComplete="email"
                         />
                         <input 
                             style={styles.input}
                             type="password"
                             name="password"
                             placeholder="Password"
-                            value={password}
-                            onChange={(e) => handleInputChange(e, setPassword)}
+                            required
+                            id="password"
+                            autoComplete="password"
+            
                         />
                         <input 
                             style={styles.input}
                             type="password"
                             name="confirmPassword"
                             placeholder="Confirm password"
-                            value={confirmPassword}
-                            onChange={(e) => handleInputChange(e, setConfirmPassword)}
+                            required
+                            id="confirm_password"
                         />
+                            <h2 style={styles.error}>{error}</h2>
                         <button style={styles.button} type="submit">Register</button>
                     </form>
                     <p>Already have an account? <a href="login" style={styles.link}>Login Now</a></p>

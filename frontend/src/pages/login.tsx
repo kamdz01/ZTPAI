@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
 import logo from '../images/logo2.png';
+import { Navigate } from "react-router-dom";
+import { useAuth } from "../auth/AuthContext.tsx";
+import { setAuthHeader } from "../services/BackendService.tsx";
+
+import { handleAuthRequest } from "../auth/AuthRequest.tsx";
+
 
 // Styles defined as a JavaScript object
 const styles = {
@@ -64,55 +70,67 @@ const styles = {
     }
 };
 
-// Login component with form handling
-const Login: React.FC = () => {
-    const [login, setLogin] = useState('');
-    const [password, setPassword] = useState('');
+const Login = () => {
+  const [login, setUsername] = useState("kamdz");
+  const [password, setPassword] = useState("kamdz");
+  const { isAuthenticated } = useAuth();
+  if (isAuthenticated()) {
+    return <Navigate to="/main" />;
+  }
 
-    const handleLoginChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setLogin(event.target.value);
-    };
+  const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    const login = data.get("login");
+    const password = data.get("password");
 
-    const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setPassword(event.target.value);
-    };
+    const result = await handleAuthRequest("login", { login, password });
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        console.log('Login:', login, 'Password:', password);
-    };
+    if (result.success) {
+      setAuthHeader(result.data.token);
+      window.location.href = "/main";
+    } else {
+      throw Error(result.error);
+    }
+  };
 
-    return (
-        <div style={styles.body}>
-            <div style={styles.main}>
-                <div style={styles.returnBtn}><a href="/"><h2>&lt;</h2></a></div>
-                <div style={styles.column}>
-                    <div style={styles.header}>Notility</div>
-                    <img src={logo} alt="logo" style={{ width: '50%' }}/>
-                    <h3>Welcome back!</h3>
-                    <form onSubmit={handleSubmit}>
-                        <input 
-                            style={styles.input}
-                            type="text"
-                            placeholder="Login"
-                            value={login}
-                            onChange={handleLoginChange}
-                        />
-                        <input 
-                            style={styles.input}
-                            type="password"
-                            placeholder="Password"
-                            value={password}
-                            onChange={handlePasswordChange}
-                        />
-                        <button style={styles.button} type="submit">Login</button>
-                    </form>
-                    <a href="forgotpass.php" style={styles.link}>Forgot password?</a>
-                    <p>Don't have an account? <a href="register" style={styles.link}>Register Now</a></p>
-                </div>
+  return (
+    <div style={styles.body}>
+        <div style={styles.main}>
+            <div style={styles.returnBtn}><a href="/"><h2>&lt;</h2></a></div>
+            <div style={styles.column}>
+                <div style={styles.header}>Notility</div>
+                <img src={logo} alt="logo" style={{ width: '50%' }}/>
+                <h3>Welcome back!</h3>
+                <form onSubmit={handleLogin}>
+                    <input 
+                        style={styles.input}
+                        type="text"
+                        placeholder="Login"
+                        id="login"
+                        name="login"
+                        autoComplete="login"
+                        value={login}
+                        onChange={(e) => setUsername(e.target.value)}
+                    />
+                    <input 
+                        style={styles.input}
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        id="password"
+                        name="password"
+                        autoComplete="current-password"
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <button style={styles.button} type="submit">Login</button>
+                </form>
+                <a href="forgotpass.php" style={styles.link}>Forgot password?</a>
+                <p>Don't have an account? <a href="register" style={styles.link}>Register Now</a></p>
             </div>
         </div>
-    );
+    </div>
+  );
 };
 
 export default Login;

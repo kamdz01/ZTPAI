@@ -1,5 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
+import { useAuth } from "./auth/AuthContext.tsx";
 
 import React from "react";
 import {
@@ -14,6 +15,8 @@ import Register from "./pages/register.tsx";
 import Panel from "./pages/panel.tsx";
 
 function App() {
+  const { isAuthenticated } = useAuth();
+
   return (
       <Router>
       <Routes>
@@ -25,14 +28,13 @@ function App() {
           element={
               <Routes>
                 <Route path="/" element={<Navigate to="/main" />} />
-                <Route path="/main" element={<Panel />} />
-                <Route path="/panel" element={<Panel />} />
+                <Route path="/main" element={isAuthenticated() ? <Panel /> : <Navigate to="/login" />} />
+                <Route path="/panel" element={isAuthenticated() ? <Panel /> : <Navigate to="/login" />} />
               </Routes>
           }
         />
       </Routes>
     </Router>
-
   );
 }
 
