@@ -1,11 +1,20 @@
 package com.kamdz.notility.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.Date;
 import java.util.Set;
 
 @Entity
 @Table(name = "users")
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Data
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -14,6 +23,10 @@ public class User {
     private String login;
     private String email;
     private String password;
+
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private Role role;
 
     @Column(name = "add_date")
     private Date add_date;
@@ -34,4 +47,6 @@ public class User {
     public void setAddDate(Date add_date) { this.add_date = add_date; }
     public Set<UserNote> getUserNotes() { return userNotes; }
     public void setUserNotes(Set<UserNote> userNotes) { this.userNotes = userNotes; }
+    public Role getRole() { return role; }
+    public void setRole(Role role) { this.role = role; }
 }
