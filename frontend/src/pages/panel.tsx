@@ -5,7 +5,7 @@ import {jwtDecode} from 'jwt-decode';
 import EditModal from './EditModal.tsx';
 import ShareModal from './ShareModal.tsx';
 import { Note } from '../types.tsx';
-
+import connectWebSocket from './WebSocket';
 
 function getUserIdFromToken(token: string): string | null {
     try {
@@ -29,6 +29,18 @@ const NotesPanel = () => {
 
     useEffect(() => {
         fetchNotes();
+        const token = localStorage.getItem('auth_token');
+        if (token) {
+            const userId = getUserIdFromToken(token);
+            const stompClient = connectWebSocket(userId, (message) => {
+                console.log('Received message: ', message);
+                fetchNotes(); // Fetch notes again when a new message is received
+            });
+
+            return () => {
+                stompClient.deactivate();
+            };
+        }
     }, [location.pathname]);
 
     const fetchNotes = () => {

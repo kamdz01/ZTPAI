@@ -34,8 +34,8 @@ public class UserNote {
         this.id = id;
     }
 
-        public String getUser() {
-        return user.getLogin();
+    public Long getUser() {
+        return user.getId();
     }
 
     public void setUser(User user) {

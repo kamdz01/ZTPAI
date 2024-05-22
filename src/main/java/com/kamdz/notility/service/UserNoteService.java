@@ -1,5 +1,6 @@
 package com.kamdz.notility.service;
 
+import com.kamdz.notility.kafka.KafkaProducer;
 import com.kamdz.notility.model.Note;
 import com.kamdz.notility.model.User;
 import com.kamdz.notility.model.UserNote;
@@ -11,6 +12,7 @@ import com.kamdz.notility.repository.UserNoteRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
@@ -23,11 +25,15 @@ public class UserNoteService {
     private final NoteRoleRepository noteRoleRepository;
     private final UserRepository userRepository;
 
-    public UserNoteService(UserNoteRepository userNoteRepository, NoteRepository noteRepository, UserRepository userRepository, NoteRoleRepository noteRoleRepository) {
+    @Autowired
+    private KafkaProducer kafkaProducer;
+
+    public UserNoteService(UserNoteRepository userNoteRepository, NoteRepository noteRepository, UserRepository userRepository, NoteRoleRepository noteRoleRepository, KafkaProducer kafkaProducer) {
         this.userNoteRepository = userNoteRepository;
         this.noteRepository = noteRepository;
         this.userRepository = userRepository;
         this.noteRoleRepository = noteRoleRepository;
+        this.kafkaProducer = kafkaProducer;
     }
 
     public List<UserNote> getAllUserNotes() {
@@ -39,7 +45,9 @@ public class UserNoteService {
     }
 
     public UserNote addUserNote(UserNote userNote) {
-        return userNoteRepository.save(userNote);
+        UserNote status = userNoteRepository.save(userNote);
+        kafkaProducer.sendMessage("note_shared", userNote.getUser()+":added note");
+        return status;
     }
 
     public UserNote updateUserNote(Long id, UserNote userNote) {
@@ -48,7 +56,7 @@ public class UserNoteService {
             existingUserNote.getNote().setNote_title(userNote.getNote().getNote_title());
             existingUserNote.getNote().setNote_content(userNote.getNote().getNote_content());
             existingUserNote.setNoteRole(userNote.getNoteRole());
-
+            kafkaProducer.sendMessage("note_shared", userNote.getUser()+":added note");
             return userNoteRepository.save(existingUserNote);
         } else {
             return null;
@@ -62,13 +70,17 @@ public class UserNoteService {
         if (userNote != null) {
             NoteRole noteRole = noteRoleRepository.findById(note_role_id).orElseThrow();
             userNote.setNoteRole(noteRole);
-            return userNoteRepository.save(userNote);
+            UserNote status = userNoteRepository.save(userNote);
+            kafkaProducer.sendMessage("note_shared", user_id+":added note");
+            return status;
         } else {
             UserNote newUserNote = new UserNote(); // Initialize noteRole
             newUserNote.setUser(user);
             newUserNote.setNoteRole(noteRoleRepository.findById(note_role_id).orElseThrow());
             newUserNote.setNote(note);
-            return userNoteRepository.save(newUserNote);
+            UserNote status = userNoteRepository.save(newUserNote);
+            kafkaProducer.sendMessage("note_shared", user_id+":added note");
+            return status;
         }
     }
 
@@ -78,7 +90,14 @@ public class UserNoteService {
             existingNote.setNote_title(Note.getNote_title());
             existingNote.setNote_content(Note.getNote_content());
 
-            return noteRepository.save(existingNote);
+            Note status = noteRepository.save(existingNote);
+
+            List<UserNote> userNotes = userNoteRepository.findByNote(existingNote);
+            for (UserNote userNote : userNotes) {
+                kafkaProducer.sendMessage("note_shared", userNote.getUser() + ":updated note");
+            }
+
+            return status;
         } else {
             return null;
         }
@@ -96,6 +115,9 @@ public class UserNoteService {
                 List<UserNote> associatedUserNotes = userNoteRepository.findByNote(note);
                 userNoteRepository.deleteAll(associatedUserNotes); // Delete all associated UserNotes
                 noteRepository.delete(note); // Delete the Note
+                for (UserNote userNoteToNot : associatedUserNotes) {
+                    kafkaProducer.sendMessage("note_shared", userNoteToNot.getUser() + ":deleted note");
+                }
             } else {
                 // Otherwise, just delete the UserNote
                 userNoteRepository.delete(userNote);
