@@ -21,13 +21,32 @@ function getUserIdFromToken(token: string): string | null {
     }
 }
 
+function getUserRoleFromToken(token: string): string | null {
+    try {
+        const decodedToken: any = jwtDecode(token);
+        if (decodedToken && decodedToken.sub) {
+            return decodedToken.role;
+        }
+        return null;
+    } catch (error) {
+        console.error('Error decoding token:', error);
+        return null;
+    }
+}
+
 const TopBar: React.FC<TopBarProps> = ({ onAddNote }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const [userId, setUserId] = useState<number | null>(null);
     const [userRole, setUserRole] = useState<number | null>(null);
-    const [userImg, setUserImg] = useState<string>('');
     const [isAddNoteModalOpen, setIsAddNoteModalOpen] = useState(false);
+    const [isPersonMenuOpen, setIsPersonMenuOpen] = useState(false);
+
+
+    const togglePersonMenu = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setIsPersonMenuOpen(!isPersonMenuOpen);
+    };
 
     useEffect(() => {
         const token = localStorage.getItem('auth_token');
@@ -36,13 +55,17 @@ const TopBar: React.FC<TopBarProps> = ({ onAddNote }) => {
             if (userIdFromToken) {
                 setUserId(parseInt(userIdFromToken));
             }
+            const userRoleFromToken = getUserRoleFromToken(token);
+            if (userRoleFromToken) { 
+                setUserRole(parseInt(userRoleFromToken));
+            }
         }
-        setUserRole(1);
-        setUserImg('../images/person-placeholder-image.png');
     }, []);
 
     const handleLogout = () => {
         console.log('Logging out...');
+        localStorage.removeItem('auth_token');
+        window.location.reload();
     };
 
     const handleAddNote = (noteTitle: string, noteContent: string) => {
@@ -124,8 +147,40 @@ const TopBar: React.FC<TopBarProps> = ({ onAddNote }) => {
                 </a>
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', width: '100%' }}>
-                <img src={person} alt="User" style={{ height: '35px', borderRadius: '50%', border: '4px solid #296F1D', marginRight: '10px' }} />
+                <img onClick={togglePersonMenu} src={person} alt="User" style={{ height: '35px', borderRadius: '50%', border: '4px solid #296F1D', marginRight: '10px' }} />
             </div>
+            {isPersonMenuOpen && (
+                    <div style={{
+                        padding: '0 10px',
+                        backgroundColor: '#1d201c',
+                        borderRadius: '10px',
+                        opacity: 1,
+                        position: 'fixed',
+                        top: '70px',
+                        right: '10px',
+                        visibility: 'visible',
+                        transition: 'opacity 0.2s, visibility 0.2s, transform 0.3s',
+                        transform: 'translateY(0)',
+                        zIndex: 5
+                    }}>
+                        {userRole === 1 && (
+                            <a href="admin" style={{ textDecoration: 'none' }}><div style={{
+                                backgroundColor: '#303D2B',
+                                padding: '5px 10px',
+                                borderRadius: '5px',
+                                color: 'white',
+                                margin: '10px 0'
+                            }}>Admin</div></a>
+                        )}
+                        <a onClick={handleLogout} style={{ textDecoration: 'none' }}><div style={{
+                            backgroundColor: '#303D2B',
+                            padding: '5px 10px',
+                            borderRadius: '5px',
+                            color: 'white',
+                            margin: '10px 0'
+                        }}>Logout</div></a>
+                    </div>
+                )}
         </div>
         {isAddNoteModalOpen && (
             <AddNoteModal
