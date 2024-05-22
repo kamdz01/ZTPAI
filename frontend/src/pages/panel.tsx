@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import TopBar from './topbar.tsx';
 import {jwtDecode} from 'jwt-decode';
 import EditModal from './EditModal.tsx';
@@ -24,8 +25,13 @@ const NotesPanel = () => {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isShareModalOpen, setIsShareModalOpen] = useState(false);
     const [currentNote, setCurrentNote] = useState<Note | null>(null);
+    const location = useLocation();
 
     useEffect(() => {
+        fetchNotes();
+    }, [location.pathname]);
+
+    const fetchNotes = () => {
         const token = localStorage.getItem('auth_token');
         if (!token) {
             console.error("No token found");
@@ -51,7 +57,7 @@ const NotesPanel = () => {
                 setUserNotes(filteredNotes);
             })
             .catch(error => console.error('Error:', error));
-    }, []);
+    };
 
     const handleEditClick = (note: Note) => {
         setCurrentNote(note);
@@ -166,7 +172,7 @@ const NotesPanel = () => {
 
     return (
         <div style={{ backgroundColor: '#031400', color: '#E0FFDF', fontFamily: 'Arial', textAlign: 'center', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <TopBar />
+            <TopBar onAddNote={fetchNotes} />
             <div style={{ width: '90%', maxWidth: '1200px' }}>
                 <div style={{ position: 'absolute', top: '10px', left: '10px', width: '30px', height: '30px', backgroundColor: 'white', borderRadius: '15%', border: '1px solid #73AD21', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <a href="/"><h2>&lt;</h2></a>
