@@ -40,6 +40,8 @@ public class SecurityConfig{
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000","http://localhost:4200"));
         configuration.setAllowedMethods(Arrays.asList(
                 HttpMethod.GET.name(),
+                HttpMethod.PUT.name(),
+                HttpMethod.DELETE.name(),
                 HttpMethod.POST.name(),
                 HttpMethod.OPTIONS.name()
         ));

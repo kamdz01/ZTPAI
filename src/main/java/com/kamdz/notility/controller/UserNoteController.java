@@ -5,6 +5,7 @@ import com.kamdz.notility.model.User;
 import com.kamdz.notility.model.NoteRole;
 import com.kamdz.notility.model.UserNote;
 import com.kamdz.notility.model.UserNoteRequest;
+import com.kamdz.notility.model.UpdateNoteRoleRequest;
 import com.kamdz.notility.service.NoteService;
 import com.kamdz.notility.service.UserNoteService;
 import org.springframework.http.HttpStatus;
@@ -68,9 +69,31 @@ public class UserNoteController {
                 ResponseEntity.notFound().build();
     }
 
+    @PutMapping("/note/{id}")
+    public ResponseEntity<Note> updateNote(@PathVariable Long id, @RequestBody Note note) {
+        Note updatedNote = userNoteService.updateNote(id, note);
+        return updatedNote != null ?
+                ResponseEntity.ok(updatedNote) :
+                ResponseEntity.notFound().build();
+    }
+
+    @PutMapping("/note-role")
+    public ResponseEntity<UserNote> updateNoteRole(@RequestBody UpdateNoteRoleRequest updateNoteRoleRequest) {
+        UserNote updatedNote = userNoteService.updateUserNoteRole(updateNoteRoleRequest.getUserId(), updateNoteRoleRequest.getNoteId(), updateNoteRoleRequest.getNoteRoleId());
+        return updatedNote != null ?
+                ResponseEntity.ok(updatedNote) :
+                ResponseEntity.notFound().build();
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUserNoteById(@PathVariable Long id) {
         userNoteService.deleteUserNoteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/users_for_note/{noteId}")
+    public ResponseEntity<List<UserNote>> getUsersByNoteId(@PathVariable Long noteId) {
+        List<UserNote> userNotes = userNoteService.getUserNotesByNoteId(noteId);
+        return ResponseEntity.ok(userNotes);
     }
 }
