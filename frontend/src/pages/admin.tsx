@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import TopBar from './topbar.tsx';
 
+import '../css/admin.css';
+
 type User = {
     user_id: number;
     login: string;
@@ -139,53 +141,54 @@ const AdminPanel: React.FC = () => {
     }, [fetchRoles]);
 
     return (
-        <div style={{ backgroundColor: '#031400', color: '#E0FFDF', fontFamily: 'Arial', textAlign: 'center', height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <TopBar onAddNote={() => {}} onSearch={() => {}} />
-            <div>
-                <h2>Update User Role</h2>
-
-                <div style={{ marginBottom: '20px' }}>
-                    <input
-                        type="text"
-                        value={searchInput}
-                        onChange={(e) => setSearchInput(e.target.value)}
-                        placeholder="Username or email"
-                        style={{ padding: '10px', backgroundColor: '#303D2B', borderRadius: '5px', border: 'none', color: 'white', margin: '0 10px' }}
-                    />
-                    <button onClick={handleSearch} style={{ backgroundColor: '#303D2B', padding: '10px', borderRadius: '5px', border: 'none', color: 'white' }}>
-                        Search
-                    </button>
+        <>
+        <TopBar onAddNote={() => {}} onSearch={() => {}} />
+            <div className="container">
+                <div className="admin-panel">
+                    <h2>Update User Role</h2>
+                    <div className="search-input-container">
+                        <input
+                            type="text"
+                            value={searchInput}
+                            onChange={(e) => setSearchInput(e.target.value)}
+                            placeholder="Username or email"
+                            className="search-input"
+                        />
+                        <button onClick={handleSearch} className="search-btn">
+                            Search
+                        </button>
+                    </div>
+                    {user && (
+                        <div className="admin-panel">
+                            <p>Username: <span>{user.login}</span></p>
+                            <p>Email: <span>{user.email}</span></p>
+                            <p>Current Role: <span>{currentRole}</span></p>
+                            <div className="user-update-section">
+                                <label htmlFor="role-select">New Role:</label>
+                                <select
+                                    id="role-select"
+                                    value={newRoleId || ''}
+                                    onChange={(e) => setNewRoleId(parseInt(e.target.value))}
+                                    className="role-select"
+                                >
+                                    {roles.map((role) => (
+                                        <option key={role.role_id} value={role.role_id}>{role.role_name}</option>
+                                    ))}
+                                </select>
+                                <button onClick={handleUpdateRole} className="update-role-btn">
+                                    Update Role
+                                </button>
+                            </div>
+                            <div>
+                                <button onClick={handleDeleteUser} className="delete-user-btn">
+                                    Delete User
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
-            {user && (
-                <div style={{ backgroundColor: '#040E00', padding: '20px', borderRadius: '10px', width: 'fit-content' }}>
-                    <p>Username: <span style={{ fontWeight: 'bold' }}>{user.login}</span></p>
-                    <p>Email: <span style={{ fontWeight: 'bold' }}>{user.email}</span></p>
-                    <p>Current Role: <span style={{ fontWeight: 'bold' }}>{currentRole}</span></p>
-                    <div>
-                        <label htmlFor="role-select">New Role:</label>
-                        <select
-                            id="role-select"
-                            value={newRoleId || ''}
-                            onChange={(e) => setNewRoleId(parseInt(e.target.value))}
-                            style={{ padding: '5px', backgroundColor: '#303D2B', border: 'none', borderRadius: '5px', color: 'white', marginLeft: '10px' }}
-                        >
-                            {roles.map((role) => (
-                                <option key={role.role_id} value={role.role_id}>{role.role_name}</option>
-                            ))}
-                        </select>
-                        <button onClick={handleUpdateRole} style={{ backgroundColor: '#303D2B', padding: '5px', borderRadius: '5px', border: 'none', color: 'white', marginLeft: '10px' }}>
-                            Update Role
-                        </button>
-                    </div>
-                    <div>
-                        <button onClick={handleDeleteUser} style={{ backgroundColor: '#303D2B', padding: '5px', borderRadius: '5px', border: 'none', color: 'white', marginTop: '10px' }}>
-                            Delete User
-                        </button>
-                    </div>
-                </div>
-            )}
-        </div>
+        </>
     );
 };
 

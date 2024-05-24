@@ -4,6 +4,8 @@ import person from '../images/person-placeholder-image.png';
 import { jwtDecode } from 'jwt-decode';
 import AddNoteModal from './AddNoteModal.tsx';
 
+import '../css/topbar.css';
+
 type TopBarProps = {
     onAddNote: () => void;
     onSearch: (query: string) => void;
@@ -132,78 +134,55 @@ const TopBar: React.FC<TopBarProps> = ({ onAddNote, onSearch }) => {
 
     return (
         <>
-        <div style={{
-            width: '100%', height: '70px', backgroundColor: '#040E00', display: 'flex', justifyContent: 'space-between',
-            alignItems: 'center', padding: '0 10px', position: 'fixed', zIndex: 3, top: 0, borderBottomLeftRadius: '15px',
-            borderBottomRightRadius: '15px'
-        }}>
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+            <div className="search-box">
                 <input
-                        type="text"
-                        placeholder="Search..."
-                        onChange={(e) => onSearch(e.target.value)}
-                        ref={searchInputRef}
-                        style={{ flexGrow: 1, maxWidth: '350px', padding: '10px', margin: '10px', borderRadius: '15px' }}
-                    />
-                 <span onClick={clearSearch} style={{ cursor: 'pointer', color: '#aaa', marginLeft: '-30px', zIndex: 5 }}>&times;</span>
-             </div>
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-                <a href="panel" style={{ textDecoration: 'none' }}>
-                    <span style={{ color: 'white', fontSize: '30px', cursor: 'pointer', margin: '0 10px' }} className="material-icons">home</span>
-                </a>
-                <a style={{ textDecoration: 'none' }} onClick={() => setIsAddNoteModalOpen(true)}>
-                        <span style={{ color: 'white', fontSize: '30px', cursor: 'pointer', margin: '0 10px' }} className="material-icons">add_circle</span>
-                    </a>
-                <a style={{ textDecoration: 'none' }}>
-                    <span style={{ color: 'gray', fontSize: '30px', cursor: 'pointer', margin: '0 10px' }} className="material-icons">favorite</span>
-                </a>
-                <a style={{ textDecoration: 'none' }}>
-                    <span style={{ color: 'gray', fontSize: '30px', cursor: 'pointer', margin: '0 10px' }} className="material-icons">settings</span>
-                </a>
+                    type="text"
+                    placeholder="Search..."
+                    onChange={(e) => onSearch(e.target.value)}
+                    ref={searchInputRef}
+                    id="search-input"
+                />
+                <span id="clear-search" onClick={clearSearch}>&times;</span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', width: '100%' }}>
-                <img onClick={togglePersonMenu} src={person} alt="User" style={{ height: '35px', borderRadius: '50%', border: '4px solid #296F1D', marginRight: '10px' }} />
+            <div className="topbar-mobile"></div>
+            <div className="topbar">
+                <div className="topbar-icons">
+                    <a href="panel">
+                        <span className="material-icons">home</span>
+                    </a>
+                    <a onClick={() => setIsAddNoteModalOpen(true)}>
+                        <span className="material-icons">add_circle</span>
+                    </a>
+                    <a>
+                        <span className="material-icons inactive">favorite</span>
+                    </a>
+                    <a>
+                        <span className="material-icons inactive">settings</span>
+                    </a>
+                </div>
+            </div>
+            <div className="topbar-icons-right">
+                <img onClick={togglePersonMenu} src={person} alt="User" className="person-img" />
             </div>
             {isPersonMenuOpen && (
-                    <div style={{
-                        padding: '0 10px',
-                        backgroundColor: '#1d201c',
-                        borderRadius: '10px',
-                        opacity: 1,
-                        position: 'fixed',
-                        top: '70px',
-                        right: '10px',
-                        visibility: 'visible',
-                        transition: 'opacity 0.2s, visibility 0.2s, transform 0.3s',
-                        transform: 'translateY(0)',
-                        zIndex: 5
-                    }}>
+                    <div className="person-context show-modal">
                         {userRole === 1 && (
-                            <a href="admin" style={{ textDecoration: 'none' }}><div style={{
-                                backgroundColor: '#303D2B',
-                                padding: '5px 10px',
-                                borderRadius: '5px',
-                                color: 'white',
-                                margin: '10px 0'
-                            }}>Admin</div></a>
+                            <a href="admin">
+                                <div className="person-btn">Admin</div>
+                            </a>
                         )}
-                        <a onClick={handleLogout} style={{ textDecoration: 'none' }}><div style={{
-                            backgroundColor: '#303D2B',
-                            padding: '5px 10px',
-                            borderRadius: '5px',
-                            color: 'white',
-                            margin: '10px 0'
-                        }}>Logout</div></a>
+                        <a onClick={handleLogout}>
+                            <div className="person-btn">Logout</div>
+                        </a>
                     </div>
                 )}
-        </div>
-        {isAddNoteModalOpen && (
-            <AddNoteModal
-                isOpen={isAddNoteModalOpen}
-                onClose={() => setIsAddNoteModalOpen(false)}
-                onAddNote={handleAddNote}
-            />
-        )}
+            {isAddNoteModalOpen && (
+                <AddNoteModal
+                    isOpen={isAddNoteModalOpen}
+                    onClose={() => setIsAddNoteModalOpen(false)}
+                    onAddNote={handleAddNote}
+                />
+            )}
         </>
     );
 };

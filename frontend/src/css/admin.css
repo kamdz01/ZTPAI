@@ -1,0 +1,84 @@
+body {
+    background-color: #031400;
+    margin: 0;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    color: #E0FFDF;
+    font-family: Arial, sans-serif;
+    align-items: center;
+    justify-content: center;
+}
+
+.content {
+    text-align: center;
+}
+
+.search-input-container {
+    margin-bottom: 20px;
+}
+
+.search-input {
+    padding: 10px;
+    background-color: #303D2B;
+    border-radius: 5px;
+    border: none;
+    color: white;
+    margin: 0 10px;
+}
+
+.search-btn {
+    background-color: #303D2B;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    color: white;
+}
+
+.admin-panel {
+    background-color: #040E00;
+    padding: 20px;
+    border-radius: 10px;
+    width: fit-content;
+}
+
+.admin-panel h2 {
+    text-align: center;
+}
+
+.admin-panel p span {
+    font-weight: bold;
+}
+
+.user-update-section {
+    padding: 10px;
+}
+
+.role-select {
+    padding: 5px;
+    background-color: #303D2B;
+    border: none;
+    border-radius: 5px;
+    color: white;
+}
+
+.update-role-btn {
+    background-color: #303D2B;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    margin-left: 10px;
+    padding: 5px;
+}
+
+.delete-user-btn {
+    background-color: #303D2B;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    padding: 5px;
+    margin-top: 10px;
+}

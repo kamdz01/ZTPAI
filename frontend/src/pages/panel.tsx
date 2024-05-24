@@ -7,6 +7,8 @@ import ShareModal from './ShareModal.tsx';
 import { Note } from '../types.tsx';
 import connectWebSocket from './WebSocket';
 
+import '../css/panel.css';
+
 function getUserIdFromToken(token: string): string | null {
     try {
         const decodedToken: any = jwtDecode(token);
@@ -199,38 +201,37 @@ const NotesPanel = () => {
     };
 
     return (
-        <div style={{ backgroundColor: '#031400', color: '#E0FFDF', fontFamily: 'Arial', textAlign: 'center', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <>
             <TopBar onAddNote={fetchNotes} onSearch={handleSearch} />
-            <div style={{ width: '90%', maxWidth: '1200px' }}>
-                <div style={{ position: 'absolute', top: '10px', left: '10px', width: '30px', height: '30px', backgroundColor: 'white', borderRadius: '15%', border: '1px solid #73AD21', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <a href="/"><h2>&lt;</h2></a>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', width: '100%' }}>
-                        {filteredNotes.map((note) => (
-                            <div key={note.note_id} style={{ backgroundColor: '#303D2B', color: 'white', borderRadius: '10px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', padding: '15px', fontSize: '16px', minHeight: '150px', cursor: 'pointer' }} onClick={() => handleEditClick(note)}>
-                                <h2>{note.note_title}</h2>
-                                <p>{note.note_content}</p>
-                                <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between' }}>
-                                    <button type="button" style={{ backgroundColor: '#031400', color: 'white', padding: '5px 10px', borderRadius: '5px', border: 'none' }} onClick={(e) => { e.stopPropagation(); handleShareClick(note); }}>Share</button>
-                                    {note.note_role_id === 1 ? (
-                                        <button type="button" style={{ backgroundColor: '#ff4d4d', color: 'white', padding: '5px 10px', borderRadius: '5px', border: 'none' }} onClick={(e) => { e.stopPropagation(); handleDeleteOrLeave(note.user_note_id, true); }}>Delete</button>
-                                    ) : (
-                                        <button type="button" style={{ backgroundColor: '#ff4d4d', color: 'white', padding: '5px 10px', borderRadius: '5px', border: 'none' }} onClick={(e) => { e.stopPropagation(); handleDeleteOrLeave(note.user_note_id, false); }}>Leave</button>
-                                    )}
+            <div className="container">
+                <div className="content">
+                    <div className="note-full">
+                        <div className="note-grid">
+                            {filteredNotes.map((note) => (
+                                <div key={note.note_id} className="text-box" onClick={() => handleEditClick(note)}>
+                                    <h2>{note.note_title}</h2>
+                                    <p>{note.note_content}</p>
+                                    <div className="button-container">
+                                        <button type="button" className="share-button" onClick={(e) => { e.stopPropagation(); handleShareClick(note); }}>Share</button>
+                                        {note.note_role_id === 1 ? (
+                                            <button type="button" className="delete-button" onClick={(e) => { e.stopPropagation(); handleDeleteOrLeave(note.user_note_id, true); }}>Delete</button>
+                                        ) : (
+                                            <button type="button" className="leave-button" onClick={(e) => { e.stopPropagation(); handleDeleteOrLeave(note.user_note_id, false); }}>Leave</button>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
                 </div>
+                {isEditModalOpen && (
+                    <EditModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} note={currentNote} onSave={handleSaveNote} />
+                )}
+                {isShareModalOpen && (
+                    <ShareModal isOpen={isShareModalOpen} onClose={() => setIsShareModalOpen(false)} noteId={currentNote ? currentNote.note_id : null} onShare={handleShareNote} />
+                )}
             </div>
-            {isEditModalOpen && (
-                <EditModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} note={currentNote} onSave={handleSaveNote} />
-            )}
-            {isShareModalOpen && (
-                <ShareModal isOpen={isShareModalOpen} onClose={() => setIsShareModalOpen(false)} noteId={currentNote ? currentNote.note_id : null} onShare={handleShareNote} />
-            )}
-        </div>
+        </>
     );
 };
 

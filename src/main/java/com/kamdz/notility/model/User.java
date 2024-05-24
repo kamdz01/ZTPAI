@@ -32,6 +32,7 @@ public class User {
     private Date add_date;
 
     @OneToMany(mappedBy = "user")
+    @OrderBy("id DESC") 
     private Set<UserNote> userNotes;
 
     // Standardowe gettery i settery

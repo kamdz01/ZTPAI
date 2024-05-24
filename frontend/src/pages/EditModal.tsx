@@ -8,6 +8,65 @@ type EditModalProps = {
     onSave: (note: Note) => void;
 };
 
+const styles = {
+    modal: {
+        display: 'none' as const,
+        position: 'fixed' as const,
+        zIndex: 1000,
+        left: 0,
+        top: 0,
+        width: '100%',
+        height: '100%',
+        overflow: 'auto' as const,
+        backgroundColor: 'rgba(0,0,0,0.4)',
+    },
+    modalOpen: {
+        display: 'block' as const,
+    },
+    modalContent: {
+        backgroundColor: '#303D2B',
+        color: 'white',
+        margin: '15% auto',
+        padding: '20px',
+        border: '1px solid #888',
+        borderRadius: '10px',
+        width: '80%',
+    },
+    closeBtn: {
+        float: 'right' as const,
+        cursor: 'pointer' as const,
+        color: 'white',
+        fontSize: '20px',
+    },
+    header: {
+        marginTop: '0',
+    },
+    input: {
+        width: 'calc(100% - 20px)',
+        padding: '10px',
+        margin: '10px 0',
+        borderRadius: '5px',
+        border: 'none' as const,
+        backgroundColor: '#f1f1f1',
+    },
+    textarea: {
+        width: 'calc(100% - 20px)',
+        padding: '10px',
+        margin: '10px 0',
+        borderRadius: '5px',
+        border: 'none' as const,
+        backgroundColor: '#f1f1f1',
+    },
+    button: {
+        backgroundColor: '#031400',
+        color: 'white',
+        padding: '10px 20px',
+        borderRadius: '5px',
+        border: 'none' as const,
+        cursor: 'pointer' as const,
+    },
+};
+
 const EditModal: React.FC<EditModalProps> = ({ isOpen, onClose, note, onSave }) => {
     const [noteTitle, setNoteTitle] = useState('');
     const [noteContent, setNoteContent] = useState('');
@@ -26,15 +85,30 @@ const EditModal: React.FC<EditModalProps> = ({ isOpen, onClose, note, onSave }) 
     };
 
     return (
-        <div style={{ display: isOpen ? 'block' : 'none', position: 'fixed', zIndex: 1000, left: 0, top: 0, width: '100%', height: '100%', overflow: 'auto', backgroundColor: 'rgba(0,0,0,0.4)' }}>
-            <div style={{ backgroundColor: '#303D2B', color: 'white', margin: '15% auto', padding: '20px', border: '1px solid #888', borderRadius: '10px', width: '80%' }}>
-                <span style={{ float: 'right', cursor: 'pointer', color: 'white', fontSize: '20px' }} onClick={onClose}>&times;</span>
-                <h2 style={{ marginTop: '0' }}>Edit Note</h2>
-                <input type="text" value={noteTitle} onChange={(e) => setNoteTitle(e.target.value)} placeholder="Note Title" required style={{ width: '100%', padding: '10px', margin: '10px 0', borderRadius: '5px', border: 'none', backgroundColor: '#f1f1f1' }} />
-                <textarea rows={10} value={noteContent} onChange={(e) => setNoteContent(e.target.value)} placeholder="Note Content" required style={{ width: '100%', padding: '10px', margin: '10px 0', borderRadius: '5px', border: 'none', backgroundColor: '#f1f1f1' }}></textarea>
-                <button onClick={handleSave} style={{ backgroundColor: '#031400', color: 'white', padding: '10px 20px', borderRadius: '5px', border: 'none', cursor: 'pointer' }}>Save</button>
+        <div style={{ ...styles.modal, ...(isOpen ? styles.modalOpen : {}) }}>
+            <div style={styles.modalContent}>
+                <span style={styles.closeBtn} onClick={onClose}>&times;</span>
+                <h2 style={styles.header}>Edit Note</h2>
+                <input
+                    type="text"
+                    value={noteTitle}
+                    onChange={(e) => setNoteTitle(e.target.value)}
+                    placeholder="Note Title"
+                    required
+                    style={styles.input}
+                />
+                <textarea
+                    rows={10}
+                    value={noteContent}
+                    onChange={(e) => setNoteContent(e.target.value)}
+                    placeholder="Note Content"
+                    required
+                    style={styles.textarea}
+                ></textarea>
+                <button onClick={handleSave} style={styles.button}>Save</button>
             </div>
         </div>
+
     );
 };
 
