@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.kamdz.notility.model.Role;
 import com.kamdz.notility.model.User;
 import com.kamdz.notility.service.UserService;
 
@@ -28,7 +29,10 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         User user = userService.findUserById(id);
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        if (user != null) {
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     // Create a new user
@@ -42,6 +46,13 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User userDetails) {
         User updatedUser = userService.updateUser(id, userDetails);
+        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+    }
+
+    // Update user
+    @PutMapping("/role/{id}")
+    public ResponseEntity<User> updateUserRole(@PathVariable Long id, @RequestBody Role userRole) {
+        User updatedUser = userService.updateUserRole(id, userRole);
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 

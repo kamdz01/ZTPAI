@@ -8,6 +8,7 @@ import com.kamdz.notility.dto.UserDto;
 import com.kamdz.notility.exceptions.AppException;
 import com.kamdz.notility.mapper.UserMapper;
 import com.kamdz.notility.model.Credential;
+import com.kamdz.notility.model.Role;
 import com.kamdz.notility.model.SignUp;
 import com.kamdz.notility.model.User;
 import com.kamdz.notility.repository.UserRepository;
@@ -50,6 +51,19 @@ public class UserService {
             User user = userOptional.get();
             user.setLogin(userDetails.getLogin());
             user.setEmail(userDetails.getEmail());
+            user.setRole(userDetails.getRole());
+
+            return userRepository.save(user);
+        } else {
+            return null;
+        }
+    }
+
+    public User updateUserRole(Long id, Role userRole) {
+        Optional<User> userOptional = userRepository.findById(id);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            user.setRole(userRole);
 
             return userRepository.save(user);
         } else {

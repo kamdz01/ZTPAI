@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import person from '../images/person-placeholder-image.png';
 import { jwtDecode } from 'jwt-decode';
@@ -6,6 +6,7 @@ import AddNoteModal from './AddNoteModal.tsx';
 
 type TopBarProps = {
     onAddNote: () => void;
+    onSearch: (query: string) => void;
 };
 
 function getUserIdFromToken(token: string): string | null {
@@ -34,13 +35,21 @@ function getUserRoleFromToken(token: string): string | null {
     }
 }
 
-const TopBar: React.FC<TopBarProps> = ({ onAddNote }) => {
+const TopBar: React.FC<TopBarProps> = ({ onAddNote, onSearch }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const [userId, setUserId] = useState<number | null>(null);
     const [userRole, setUserRole] = useState<number | null>(null);
     const [isAddNoteModalOpen, setIsAddNoteModalOpen] = useState(false);
     const [isPersonMenuOpen, setIsPersonMenuOpen] = useState(false);
+    const searchInputRef = useRef<HTMLInputElement>(null);
+
+    const clearSearch = () => {
+        if (searchInputRef.current) {
+            searchInputRef.current.value = '';
+            onSearch('');
+        }
+    };
 
 
     const togglePersonMenu = (e: React.MouseEvent) => {
@@ -129,8 +138,14 @@ const TopBar: React.FC<TopBarProps> = ({ onAddNote }) => {
             borderBottomRightRadius: '15px'
         }}>
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-                 <input type="text" placeholder="Search..." style={{ flexGrow: 1, maxWidth: '350px', padding: '10px', margin: '10px', borderRadius: '15px' }} />
-                 <span style={{ cursor: 'pointer', color: '#aaa', marginLeft: '-30px', zIndex: 5 }}>&times;</span>
+                <input
+                        type="text"
+                        placeholder="Search..."
+                        onChange={(e) => onSearch(e.target.value)}
+                        ref={searchInputRef}
+                        style={{ flexGrow: 1, maxWidth: '350px', padding: '10px', margin: '10px', borderRadius: '15px' }}
+                    />
+                 <span onClick={clearSearch} style={{ cursor: 'pointer', color: '#aaa', marginLeft: '-30px', zIndex: 5 }}>&times;</span>
              </div>
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
                 <a href="panel" style={{ textDecoration: 'none' }}>

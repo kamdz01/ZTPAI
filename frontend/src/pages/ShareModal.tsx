@@ -24,8 +24,21 @@ const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, noteId, onShar
 
     useEffect(() => {
         if (noteId !== null) {
+            const token = localStorage.getItem('auth_token');
+            if (!token) {
+                console.error("No token found");
+                return;
+            }
+        
+            const headers = {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            };
             // Fetch roles from the API
-            fetch('http://localhost:8080/api/note-roles')
+            fetch('http://localhost:8080/api/note-roles', {
+                method: 'GET',
+                headers: headers,
+            })
                 .then(response => response.json())
                 .then(data => {
                     setRoles(data);
@@ -40,7 +53,21 @@ const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, noteId, onShar
     }, [noteId]);
 
     const fetchSharedUsers = (noteId: number) => {
-        fetch(`http://localhost:8080/api/user-notes/users_for_note/${noteId}`)
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+            console.error("No token found");
+            return;
+        }
+    
+        const headers = {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        };
+
+        fetch(`http://localhost:8080/api/user-notes/users_for_note/${noteId}`, {
+            method: 'GET',
+            headers: headers,
+        })
             .then(response => response.json())
             .then(data => setSharedUsers(data))
             .catch(error => console.error('Error fetching shared users:', error));

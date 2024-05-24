@@ -99,7 +99,6 @@ public class SecurityConfig {
             "/main",
             "/login",
             "/signup",
-            "/api/**",
             "/ws/**",
     };
 

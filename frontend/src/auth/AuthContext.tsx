@@ -4,6 +4,7 @@ import { jwtDecode } from "jwt-decode";
 interface AuthContextType {
   authToken: string | null;
   isAuthenticated: () => boolean;
+  isAdmin: () => boolean;
   login: (token: string, exp: number) => void;
   logout: () => void;
 }
@@ -42,6 +43,23 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     return true;
   };
 
+  const isAdmin = (): boolean => {
+    const token = localStorage.getItem("auth_token");
+    if (!token) {
+      return false;
+    }
+    try {
+        const decodedToken: any = jwtDecode(token);
+        if (decodedToken && decodedToken.sub) {
+            return decodedToken.role === 1;
+        }
+        return false;
+    } catch (error) {
+        console.error('Error decoding token:', error);
+        return false;
+    }
+}
+
   const login = (token: string, exp: number): void => {
     const tokenData = JSON.stringify({ token, exp });
     localStorage.setItem("auth_token", tokenData);
@@ -56,6 +74,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   const contextValue: AuthContextType = {
     authToken,
     isAuthenticated,
+    isAdmin,
     login,
     logout,
   };

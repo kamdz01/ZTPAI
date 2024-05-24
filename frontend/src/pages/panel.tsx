@@ -25,6 +25,8 @@ const NotesPanel = () => {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isShareModalOpen, setIsShareModalOpen] = useState(false);
     const [currentNote, setCurrentNote] = useState<Note | null>(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [filteredNotes, setFilteredNotes] = useState<Note[]>([]);
     const location = useLocation();
 
     useEffect(() => {
@@ -67,9 +69,23 @@ const NotesPanel = () => {
                     user_note_id: note.id
                 }));
                 setUserNotes(filteredNotes);
+                setFilteredNotes(filteredNotes);
             })
             .catch(error => console.error('Error:', error));
     };
+
+    const handleSearch = (query: string) => {
+        setSearchQuery(query);
+        if (query === '') {
+            setFilteredNotes(notes);
+        } else {
+            setFilteredNotes(notes.filter(note => 
+                note.note_title.toLowerCase().includes(query.toLowerCase()) || 
+                note.note_content.toLowerCase().includes(query.toLowerCase())
+            ));
+        }
+    };
+    
 
     const handleEditClick = (note: Note) => {
         setCurrentNote(note);
@@ -93,7 +109,7 @@ const NotesPanel = () => {
             'Content-Type': 'application/json'
         };
 
-        fetch(`http://localhost:8080/api/notes/${updatedNote.note_id}`, {
+        fetch(`http://localhost:8080/api/user-notes/note/${updatedNote.note_id}`, {
             method: 'PUT',
             headers: headers,
             body: JSON.stringify({
@@ -184,14 +200,14 @@ const NotesPanel = () => {
 
     return (
         <div style={{ backgroundColor: '#031400', color: '#E0FFDF', fontFamily: 'Arial', textAlign: 'center', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <TopBar onAddNote={fetchNotes} />
+            <TopBar onAddNote={fetchNotes} onSearch={handleSearch} />
             <div style={{ width: '90%', maxWidth: '1200px' }}>
                 <div style={{ position: 'absolute', top: '10px', left: '10px', width: '30px', height: '30px', backgroundColor: 'white', borderRadius: '15%', border: '1px solid #73AD21', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <a href="/"><h2>&lt;</h2></a>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', width: '100%' }}>
-                        {notes.map((note) => (
+                        {filteredNotes.map((note) => (
                             <div key={note.note_id} style={{ backgroundColor: '#303D2B', color: 'white', borderRadius: '10px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', padding: '15px', fontSize: '16px', minHeight: '150px', cursor: 'pointer' }} onClick={() => handleEditClick(note)}>
                                 <h2>{note.note_title}</h2>
                                 <p>{note.note_content}</p>
