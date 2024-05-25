@@ -228,7 +228,7 @@ const NotesPanel = () => {
                     <EditModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} note={currentNote} onSave={handleSaveNote} />
                 )}
                 {isShareModalOpen && (
-                    <ShareModal isOpen={isShareModalOpen} onClose={() => setIsShareModalOpen(false)} noteId={currentNote ? currentNote.note_id : null} onShare={handleShareNote} />
+                    <ShareModal isOpen={isShareModalOpen} onClose={() => setIsShareModalOpen(false)} noteId={currentNote ? currentNote.note_id : null} noteRoleId={currentNote ? currentNote.note_role_id : null} onShare={handleShareNote} />
                 )}
             </div>
         </>

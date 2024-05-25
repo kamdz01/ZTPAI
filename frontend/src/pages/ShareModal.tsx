@@ -4,6 +4,7 @@ type ShareModalProps = {
     isOpen: boolean;
     onClose: () => void;
     noteId: number | null;
+    noteRoleId: number | null;
     onShare: (noteId: number, userToShare: string, role: number, onSuccess: () => void) => void;
 };
 
@@ -89,14 +90,14 @@ type SharedUser = {
     };
 };
 
-const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, noteId, onShare }) => {
+const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, noteId, noteRoleId, onShare }) => {
     const [userToShare, setUserToShare] = useState('');
     const [role, setRole] = useState('');
     const [roles, setRoles] = useState<any[]>([]);
     const [sharedUsers, setSharedUsers] = useState<SharedUser[]>([]);
 
     useEffect(() => {
-        if (noteId !== null) {
+        if (noteId !== null && noteRoleId !== null) {
             const token = localStorage.getItem('auth_token');
             if (!token) {
                 console.error("No token found");
@@ -114,16 +115,17 @@ const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, noteId, onShar
             })
                 .then(response => response.json())
                 .then(data => {
-                    setRoles(data);
-                    if (data.length > 0) {
-                        setRole(data[0].id); // Set the first role as the default
+                    const filteredRoles = data.filter((role: any) => role.id >= (noteRoleId || 0));
+                    setRoles(filteredRoles);
+                    if (filteredRoles.length > 0) {
+                        setRole(filteredRoles[0].id); // Set the first role as the default
                     }
                 })
                 .catch(error => console.error('Error fetching roles:', error));
 
                 fetchSharedUsers(noteId);
         }
-    }, [noteId]);
+    }, [noteId, noteRoleId]);
 
     const fetchSharedUsers = (noteId: number) => {
         const token = localStorage.getItem('auth_token');

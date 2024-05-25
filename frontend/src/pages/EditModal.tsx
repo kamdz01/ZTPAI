@@ -70,11 +70,13 @@ const styles = {
 const EditModal: React.FC<EditModalProps> = ({ isOpen, onClose, note, onSave }) => {
     const [noteTitle, setNoteTitle] = useState('');
     const [noteContent, setNoteContent] = useState('');
+    const [noteRole, setNoteRole] = useState(3);
 
     useEffect(() => {
         if (note) {
             setNoteTitle(note.note_title);
             setNoteContent(note.note_content);
+            setNoteRole(note.note_role_id);
         }
     }, [note]);
 
@@ -96,6 +98,7 @@ const EditModal: React.FC<EditModalProps> = ({ isOpen, onClose, note, onSave }) 
                     placeholder="Note Title"
                     required
                     style={styles.input}
+                    disabled={noteRole > 2}
                 />
                 <textarea
                     rows={10}
@@ -104,6 +107,7 @@ const EditModal: React.FC<EditModalProps> = ({ isOpen, onClose, note, onSave }) 
                     placeholder="Note Content"
                     required
                     style={styles.textarea}
+                    disabled={noteRole > 2}
                 ></textarea>
                 <button onClick={handleSave} style={styles.button}>Save</button>
             </div>
